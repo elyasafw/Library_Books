@@ -29,7 +29,8 @@ library-api/
 │   ├── db_connection.py
 │   └── member_db.py
 ├── logs/
-│   └── app.log
+│   ├── logs.log
+│   └── logs_config.py
 ├── routes/
 │   ├── book_routes.py
 │   ├── member_routes.py
