@@ -23,7 +23,6 @@
 ## מבנה תיקיות הפרויקט:
 
 ```text
-library-api/
 ├── database/
 │   ├── book_db.py
 │   ├── db_connection.py
