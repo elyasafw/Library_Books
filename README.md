@@ -107,7 +107,13 @@ graph LR
 
 ### התקנה:  
 ```bash
-    docker run --name library -e MYSQL_ROOT_PASSWORD=<password> -p 3308:3306 -d mysql:latest
+    docker run --name library \
+        -e MYSQL_ROOT_PASSWORD=root_password \
+        -e MYSQL_DATABASE=library_db \
+        -e MYSQL_USER=library \
+        -e MYSQL_PASSWORD=100526 \
+        -p 3308:3306 \
+        -d mysql:latest
     pip install -r requirements.txt
 ```
 ### הרצה:
