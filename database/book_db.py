@@ -27,7 +27,7 @@ class BooksDB:
             self.conn.commit()
 
     def get_all_books(self):
-        with self.conn.cursor() as cursor:
+        with self.conn.cursor(dictionary=True) as cursor:
             cursor.execute("SELECT * FROM books")
             all_books = cursor.fetchall()
         return all_books
