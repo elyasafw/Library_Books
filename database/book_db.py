@@ -80,18 +80,21 @@ class BooksDB:
         with DB.get_connection().cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM books")
             all_books = cursor.fetchone()
+            logger.info("Getting count of total books")
             return all_books[0] if all_books else 0
 
     def available_books(self):
         with DB.get_connection().cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM books WHERE is_available = TRUE")
             available_books = cursor.fetchone()
+            logger.info("Getting all available books")
             return available_books[0] if available_books else 0
 
     def count_borrowed_books(self):
         with DB.get_connection().cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM books WHERE is_available = FALSE")
             borrowed_books = cursor.fetchone()
+            logger.info("Getting count of borrows books")
             return borrowed_books[0] if borrowed_books else 0
 
     def count_by_genre(self):
@@ -113,4 +116,5 @@ class BooksDB:
                                 WHERE borrowed_by_member_id = %s AND is_available = FALSE"""
             cursor.execute(query, [member_id])
             count_borrow = cursor.fetchone()
+            logger.info(f"Getting count of borrows by member ID: {member_id}")
             return count_borrow[0] if count_borrow else 0
