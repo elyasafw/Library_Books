@@ -1,4 +1,5 @@
 import mysql.connector
+from logs.logs_config import logger
 
 
 class DBconnection:
@@ -16,9 +17,10 @@ class DBconnection:
                 database="library_db",
                 port=3308,
             )
-            print("Connected successfully to library_db")
+            logger.info("Connected successfully to library_db")
         except mysql.connector.Error as e:
-            print(f"Connection failed: {e}")
+            logger.error(f"Connection failed: {e}")
+            raise e
 
     def get_connection(self):
         if self.conn is None or not self.conn.is_connected():
@@ -45,7 +47,7 @@ class DBconnection:
                         )"""
             )
             self.conn.commit()
-            print("Members table ready")
+            logger.info("Members table ready")
 
     def create_books_table(self):
         with self.get_connection().cursor() as cursor:
@@ -61,7 +63,13 @@ class DBconnection:
                         )"""
             )
             self.conn.commit()
-            print("Books table ready")
+            logger.info("Books table ready")
+
+
+    def close_connection(self):
+        if self.conn and self.conn.is_connected():
+            self.conn.close()
+            logger.info("Main database connection closed")
 
 
 
