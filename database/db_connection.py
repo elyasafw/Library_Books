@@ -7,6 +7,8 @@ class DBconnection:
         self.create_db()
         self.conn = None
         self.connect()
+        self.create_members_table()
+        self.create_books_table()
 
     def connect(self):
         try:
