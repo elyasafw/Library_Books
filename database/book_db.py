@@ -1,24 +1,12 @@
 from db_connection import DB
-from pydantic import BaseModel
 from logs.logs_config import logger
 
-
-class NewBook(BaseModel):
-    title: str
-    author: str
-    genre: str
-
-class UpdateBook(BaseModel):
-    title: str | None = None
-    author: str | None = None
-    genre: str | None = None
 
 class BooksDB:
     def __init__(self):
         DB.get_connection()
 
-    def create_book(self, new_book: NewBook):
-        book_data = new_book.model_dump()
+    def create_book(self, book_data):
         values = [book_data["title"], book_data["author"], book_data["genre"]]
         with DB.get_connection().cursor() as cursor:
             query = """INSERT INTO books (title, author, genre)
@@ -55,14 +43,10 @@ class BooksDB:
             logger.warning(f"Book ID: {book_id} does not exists")
             return None
 
-    def update_book(self, book_id, update_data: UpdateBook):
-        changes = update_data.model_dump(exclude_unset=True)
-        if not changes:
-            logger.warning("Book data update is empty..  No changes")
-            return
+    def update_book(self, book_id, update_data):
         columns = []
         values = []
-        for key, value in changes.items():
+        for key, value in update_data.items():
             columns.append(f"{key} = %s")
             values.append(value)
         values.append(book_id)
@@ -74,8 +58,8 @@ class BooksDB:
             DB.get_connection().commit()
             if is_update:
                 logger.info(f"Book ID: {book_id} updated successfully")
-                return changes
-            logger.warning("Book updated field.. ID not found / no changes")
+                return update_data
+            logger.warning("Book updated failed.. ID not found / no changes")
             return None
 
     def set_available(self, book_id, val, member_id):

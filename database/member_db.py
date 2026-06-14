@@ -41,7 +41,7 @@ class MemberDB:
             logger.warning("Table members is empty")
             return
 
-    def member_by_id(self, member_id):
+    def get_member_by_id(self, member_id):
         with DB.get_connection().cursor(dictionary=True) as cursor:
             query = "SELECT * FROM members WHERE id = %s"
             cursor.execute(query, [member_id])
@@ -72,7 +72,7 @@ class MemberDB:
             if is_update:
                 logger.info(f"Member ID: {member_id} updated successfully")
                 return changes
-            logger.warning("Member updated field.. ID not found / no changes")
+            logger.warning("Member updated failed.. ID not found / no changes")
             return None
 
     def deactivate_member(self, member_id):
