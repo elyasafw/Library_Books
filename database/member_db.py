@@ -1,18 +1,15 @@
-from db_connection import DB
-from pydantic import BaseModel, EmailStr
+from .db_connection import DB
 from logs.logs_config import logger
 
 
 class MemberDB:
-    def __init__(self):
-        DB.get_connection()
 
     def create_member(self, member_data):
             values = [member_data["name"], member_data["email"]]
             with DB.get_connection().cursor() as cursor:
                 query = """INSERT INTO members (name, email)
                                     VALUES (%s, %s)"""
-                cursor.execute(query, [values])
+                cursor.execute(query, values)
                 if cursor.rowcount > 0:
                     DB.get_connection().commit()
                     logger.info(f"Member {member_data["name"]} created successfully")

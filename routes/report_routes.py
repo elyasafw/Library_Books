@@ -1,6 +1,6 @@
-from fastapi import APIRouter
-from member_routes import MDB
-from book_routes import BDB
+from fastapi import APIRouter, HTTPException, status
+from .member_routes import MDB
+from .book_routes import BDB
 
 
 router = APIRouter()
@@ -23,4 +23,9 @@ def report_by_genre():
 @router.get("/reports/top-member")
 def report_top_member():
     top_member = MDB.get_top_member()
-    return top_member
+    if top_member:
+        return top_member
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Table members is empty"
+        )

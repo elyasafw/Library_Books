@@ -27,32 +27,45 @@ def create_new_book(new_book: NewBook):
         success_create =  BDB.create_book(book_data)
         if success_create:
             return success_create
-        return {"message": "created book failed"}
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="created new book is failed"
+            )
 
 @router.get("/books")
 def get_all_books_in_table():
         all_books = BDB.get_all_books()
         if all_books:
             return all_books
-        return {"message": "books list is empty"}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="books list is empty"
+            )
 
 @router.get("/books/{id}")
 def get_book_by_id(id: int):
-    book = BDB.get_book_by_id()
+    book = BDB.get_book_by_id(id)
     if book:
         return book
-    return {"message": "book not found"}
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"book ID: {id} not found"
+        )
 
 @router.patch("/books/{id}")
 def update_book(id: int, update_data: UpdateBook):
-    changes = update_data.model_dump(exclude_unset=True)
+    changes = update_data.model_dump(exclude_unset=True, exclude_none=True)
     if not changes:
         logger.warning("Book data update is empty..  No changes")
         return {"message": "data is empty..."}
     success_update = BDB.update_book(id, changes)
     if success_update:
-        return success_update
-    return {"message": "update book failed"}
+        return {"message": f"update successfully: {success_update}"}
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Update failed. Book ID: {id} not found / no new changes were provided"
+        )
+
 
 @router.patch("/books/{id}/borrow/{member_id}")
 def borrow_book(id: int, member_id: int):
@@ -71,7 +84,7 @@ def borrow_book(id: int, member_id: int):
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"message": "member does not exists"}
             )
-    if count_borrows == 3:
+    if count_borrows < 3:
         book = BDB.get_book_by_id(id)
     else:
         logger.warning("Member has reached = 3 borrows")
@@ -84,7 +97,7 @@ def borrow_book(id: int, member_id: int):
             val = False
             borrowed_book = BDB.set_available(id, val, member_id)
             MDB.increment_borrows(member_id)
-            return borrowed_book
+            return {"message": f"book ID: {id} borrow to member ID: {member_id}"}
         else:
             logger.warning(f"Book ID: {id} not available")
             raise HTTPException(
@@ -97,7 +110,7 @@ def borrow_book(id: int, member_id: int):
             detail={"message": "book does not exists"}
             )
 
-@router("/books/{id}/return/{member_id}")
+@router.patch("/books/{id}/return/{member_id}")
 def return_book(id:int, member_id: int):
     member = MDB.get_member_by_id(member_id)
     if member:
@@ -113,7 +126,7 @@ def return_book(id:int, member_id: int):
                 val = True
                 member_id = None
                 returned_book = BDB.set_available(id, val, member_id)
-                return returned_book
+                return {"message": f"book ID: {id} return to library"}
             else:
                 logger.warning(f"Book ID: {id} not borrow by member ID: {member_id}")
                 raise HTTPException(

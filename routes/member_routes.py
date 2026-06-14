@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
 from pydantic import BaseModel, EmailStr
 from database import member_db as member
 from logs.logs_config import logger
@@ -25,21 +25,30 @@ def create_new_member(new_member: NewMember):
     success_create =  MDB.create_member(member_data)
     if success_create:
         return success_create
-    return {"message": "created member failed"}
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail="created new member is failed"
+        )
 
 @router.get("/members")
 def get_all_members_in_table():
     all_members = MDB.get_all_members()
     if all_members:
         return all_members
-    return {"message": "books list is empty"}
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="books list is empty"
+        )
 
 @router.get("/members/{id}")
 def get_member_by_id(id: int):
-    member = MDB.get_member_by_id()
+    member = MDB.get_member_by_id(id)
     if member:
         return member
-    return {"message": "book not found"}
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"member ID: {id} not found"
+        )
 
 @router.patch("/members/{id}")
 def update_member(id: int, update_data: UpdateMember):
@@ -49,19 +58,28 @@ def update_member(id: int, update_data: UpdateMember):
         return {"message": "data is empty..."}
     success_update = MDB.update_member(id, changes)
     if success_update:
-        return success_update
-    return {"message": "update members failed"}
+        return {"message": f"update successfully: {success_update}"}
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Update failed. Member ID: {id} not found / no new changes were provided"
+        )
 
 @router.patch("/members/{id}/deactivate")
 def deactivate_member(id: int):
     success_deactivate = MDB.deactivate_member(id)
     if success_deactivate:
         return {"message": "member deactivated successfully"}
-    return {"message": "deactivate member failed"}
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=f"deactivate member is failed, Member ID: {id} not found"
+        )
 
 @router.patch("/members/{id}/activate")
 def activate_member(id: int):
     success_activate = MDB.activate_member(id)
     if success_activate:
         return {"message": "member activated successfully"}
-    return {"message": "activate member failed"}
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=f"activate member is failed, Member ID: {id} not found"
+        )

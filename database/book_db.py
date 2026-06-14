@@ -1,20 +1,18 @@
-from db_connection import DB
+from .db_connection import DB
 from logs.logs_config import logger
 
 
 class BooksDB:
-    def __init__(self):
-        DB.get_connection()
 
     def create_book(self, book_data):
-        values = [book_data["title"], book_data["author"], book_data["genre"]]
+        values = [book_data["title"].lower(), book_data["author"].lower(), book_data["genre"].lower()]
         with DB.get_connection().cursor() as cursor:
             query = """INSERT INTO books (title, author, genre)
                                 VALUES (%s, %s, %s)"""
             cursor.execute(query, values)
             cursor.fetchone()
+            DB.get_connection().commit()
             book_create = cursor.rowcount > 0
-            self.DB.get_connection().commit()
             if book_create:
                 logger.info(f"Book {book_data["title"]} created successful")
                 return book_data
@@ -48,14 +46,14 @@ class BooksDB:
         values = []
         for key, value in update_data.items():
             columns.append(f"{key} = %s")
-            values.append(value)
+            values.append(value.lower())
         values.append(book_id)
         with DB.get_connection().cursor() as cursor:
             query = f"""UPDATE books
                                 SET {", ".join(columns)} WHERE id = %s"""
             cursor.execute(query, values)
-            is_update = cursor.rowcount > 0
             DB.get_connection().commit()
+            is_update = cursor.rowcount > 0
             if is_update:
                 logger.info(f"Book ID: {book_id} updated successfully")
                 return update_data

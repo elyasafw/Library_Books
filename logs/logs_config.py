@@ -6,7 +6,7 @@ logging.basicConfig(
     style="{",
     format="{asctime} | {levelname} | {message}",
     handlers=[
-        logging.FileHandler("app.log"),
+        logging.FileHandler("logs/app.log"),
         logging.StreamHandler()
         ]
     )
