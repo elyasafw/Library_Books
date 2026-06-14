@@ -3,22 +3,11 @@ from pydantic import BaseModel, EmailStr
 from logs.logs_config import logger
 
 
-class NewMember(BaseModel):
-    name: str
-    email: EmailStr
-
-
-class UpdateMember(BaseModel):
-    name: str | None = None
-    email: EmailStr | None = None
-
-
 class MemberDB:
     def __init__(self):
         DB.get_connection()
 
-    def create_member(self, new_member: NewMember):
-            member_data = new_member.model_dump()
+    def create_member(self, member_data):
             values = [member_data["name"], member_data["email"]]
             with DB.get_connection().cursor() as cursor:
                 query = """INSERT INTO members (name, email)
@@ -52,14 +41,10 @@ class MemberDB:
             logger.warning(f"Member ID: {member_id} does not exists")
             return None
 
-    def update_member(self, member_id, update_data: UpdateMember):
-        changes = update_data.model_dump(exclude_unset=True)
-        if not changes:
-            logger.warning("Member data update is empty..  No changes")
-            return
+    def update_member(self, member_id, update_data):
         columns = []
         values = []
-        for key, value in changes.items():
+        for key, value in update_data.items():
             columns.append(f"{key} = %s")
             values.append(value)
         values.append(member_id)
@@ -71,7 +56,7 @@ class MemberDB:
             DB.get_connection().commit()
             if is_update:
                 logger.info(f"Member ID: {member_id} updated successfully")
-                return changes
+                return update_data
             logger.warning("Member updated failed.. ID not found / no changes")
             return None
 
@@ -84,7 +69,7 @@ class MemberDB:
             is_deactivate = cursor.rowcount
             DB.get_connection().commit()
             if is_deactivate:
-                logger.info(f"Member ID: {member_id} deactivate successfully")
+                logger.info(f"Member ID: {member_id} deactivated successfully")
                 return is_deactivate
             logger.warning(f"Member ID: {member_id} does not exists")
             return None
