@@ -108,6 +108,7 @@ class MemberDB:
                                 WHERE is_active = TRUE"""
             cursor.execute(query)
             active_members = cursor.fetchone()
+            logger.info("Getting count of active members")
             return active_members[0] if active_members else 0
 
     def get_top_member(self):

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from pydantic import BaseModel, EmailStr
-from database import book_db as book, member_db as member
+from database import member_db as member
 from logs.logs_config import logger
 
 
