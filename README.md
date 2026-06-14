@@ -28,7 +28,7 @@
 │   ├── db_connection.py
 │   └── member_db.py
 ├── logs/
-│   ├── logs.log
+│   ├── app.log
 │   └── logs_config.py
 ├── routes/
 │   ├── book_routes.py
