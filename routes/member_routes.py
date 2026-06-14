@@ -14,7 +14,6 @@ class UpdateMember(BaseModel):
     email: EmailStr | None = None
 
 
-BDB = book.BooksDB()
 MDB = member.MemberDB()
 
 
@@ -37,7 +36,7 @@ def get_all_members_in_table():
 
 @router.get("/members/{id}")
 def get_member_by_id(id: int):
-    member = BDB.get_book_by_id()
+    member = MDB.get_member_by_id()
     if member:
         return member
     return {"message": "book not found"}
