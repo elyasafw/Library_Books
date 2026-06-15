@@ -18,12 +18,12 @@ def global_db_error_handler(request: Request, exc: MySQLError):
     user_message = "Internal server error.. Something went wrong"
     if exc.errno == 1062:
         response_status = status.HTTP_409_CONFLICT
-        user_message = "The provided email or unique field already exists."
+        user_message = "The provided email or unique field already exists"
     elif exc.errno == 1452:
         response_status = status.HTTP_400_BAD_REQUEST
         user_message = "Invalid reference. One of the related records does not exist"
     elif exc.errno == 1265:
-        response_status = status.HTTP_400_BAD_REQUEST
+        response_status = status.HTTP_422_UNPROCESSABLE_CONTENT
         user_message = "Genre column must be: History / Science / Non-Fiction / Fiction / Other"
     return JSONResponse(
         status_code=response_status,
@@ -34,9 +34,9 @@ def global_db_error_handler(request: Request, exc: MySQLError):
 def validation_exception_handler(request: Request, exc: RequestValidationError):
     logger.warning(f"Validation failed on {request.url.path}: {exc.errors()}")
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": "Invalid input data format. Please check your fields."},
-    )
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+        content={"detail": "Invalid input data format. Please check your fields"},
+        )
 
 
 

@@ -55,7 +55,10 @@ def update_member(id: int, update_data: UpdateMember):
     changes = update_data.model_dump(exclude_unset=True)
     if not changes:
         logger.warning("Member data update is empty..  No changes")
-        return {"message": "data is empty..."}
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="data is empty..."
+            )
     success_update = MDB.update_member(id, changes)
     if success_update:
         return {"message": f"update successfully: {success_update}"}

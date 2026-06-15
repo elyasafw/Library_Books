@@ -57,7 +57,10 @@ def update_book(id: int, update_data: UpdateBook):
     changes = update_data.model_dump(exclude_unset=True, exclude_none=True)
     if not changes:
         logger.warning("Book data update is empty..  No changes")
-        return {"message": "data is empty..."}
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="data is empty..."
+            )
     success_update = BDB.update_book(id, changes)
     if success_update:
         return {"message": f"update successfully: {success_update}"}

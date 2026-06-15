@@ -14,7 +14,7 @@ class BooksDB:
             DB.get_connection().commit()
             book_create = cursor.rowcount > 0
             if book_create:
-                logger.info(f"Book {book_data["title"]} created successful")
+                logger.info(f"Book {book_data["title"]} created successfully")
                 return book_data
             logger.warning("Book not create..")
             return
