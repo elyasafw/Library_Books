@@ -59,6 +59,6 @@ def shutdown_event():
     DB.close_connection()
 
 
-app.include_router(books_router, prefix="/books")
-app.include_router(members_router, prefix="/members")
-app.include_router(reports_router, prefix="/reports")
+app.include_router(books_router)
+app.include_router(members_router)
+app.include_router(reports_router)
